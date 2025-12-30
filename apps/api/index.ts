@@ -17,10 +17,21 @@ function getNextService() {
   return service;
 }
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
 const server = Bun.serve({
   port: process.env.PORT ?? 3000,
   async fetch(req) {
     const { pathname } = new URL(req.url)
+
+    // Handle CORS preflight
+    if (req.method === 'OPTIONS') {
+      return new Response(null, { headers: corsHeaders });
+    }
 
     if (req.method === 'POST' && pathname === '/chat') {
       const { messages } = await req.json() as { messages: ChatMessage[] };
@@ -31,6 +42,7 @@ const server = Bun.serve({
 
       return new Response(stream, {
         headers: {
+          ...corsHeaders,
           'Content-Type': 'text/event-stream',
           'Cache-Control': 'no-cache',
           'Connection': 'keep-alive',
@@ -38,7 +50,7 @@ const server = Bun.serve({
       });
     }
 
-    return new Response("Not found", { status: 404 });
+    return new Response("Not found", { status: 404, headers: corsHeaders });
   }
 })
 
