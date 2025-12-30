@@ -71,7 +71,7 @@ export default function App() {
       console.error('Error:', error);
       setMessages(prev => [
         ...prev,
-        { role: 'assistant', content: 'Error: Could not get response' }
+        { role: 'assistant', content: 'Error: No se pudo obtener respuesta' }
       ]);
     } finally {
       setIsLoading(false);
@@ -84,12 +84,12 @@ export default function App() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.header}>
-        <Text style={styles.headerText}>AI Chat</Text>
+        <Text style={styles.headerText}>Chat IA</Text>
       </View>
 
       <ScrollView style={styles.messages} contentContainerStyle={styles.messagesContent}>
         {messages.length === 0 && (
-          <Text style={styles.placeholder}>Start a conversation...</Text>
+          <Text style={styles.placeholder}>Inicia una conversación...</Text>
         )}
         {messages.map((msg, i) => (
           <View 
@@ -111,7 +111,7 @@ export default function App() {
           style={styles.input}
           value={input}
           onChangeText={setInput}
-          placeholder="Type a message..."
+          placeholder="Escribe un mensaje..."
           onSubmitEditing={sendMessage}
           editable={!isLoading}
         />
