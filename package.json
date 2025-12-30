@@ -7,6 +7,7 @@
     "test:api": "cd apps/api && ./test-api.sh"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "hono": "^4.11.3"
   }
 }

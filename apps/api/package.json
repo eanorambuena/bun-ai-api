@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "@cerebras/cerebras_cloud_sdk": "^1.59.0",
-    "groq-sdk": "^0.37.0"
+    "groq-sdk": "^0.37.0",
+    "hono": "^4.11.3"
   },
   "devDependencies": {
     "@types/bun": "latest",
