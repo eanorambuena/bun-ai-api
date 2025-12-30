@@ -1,21 +1,12 @@
 {
-  "name": "bun-ai-api",
-  "module": "index.ts",
-  "type": "module",
+  "name": "bun-ai-chat",
   "private": true,
+  "workspaces": ["apps/*"],
   "scripts": {
-    "start": "bun run index.ts",
-    "dev": "bun --watch run index.ts",
-    "test:api": "./test-api.sh"
+    "dev:api": "cd apps/api && bun run dev",
+    "test:api": "cd apps/api && ./test-api.sh"
   },
   "devDependencies": {
     "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  },
-  "dependencies": {
-    "@cerebras/cerebras_cloud_sdk": "^1.59.0",
-    "groq-sdk": "^0.37.0"
   }
 }
