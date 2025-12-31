@@ -8,7 +8,8 @@ import {
   TouchableOpacity, 
   ScrollView,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Modal
 } from 'react-native';
 
 interface ChatMessage {
@@ -16,15 +17,19 @@ interface ChatMessage {
   content: string;
 }
 
-const API_URL = 'http://localhost:3000';
+// Default: localhost para web, vacío para móvil (requiere configurar)
+const DEFAULT_API_URL = Platform.OS === 'web' ? 'http://localhost:3000' : '';
 
 export default function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [apiUrl, setApiUrl] = useState(DEFAULT_API_URL);
+  const [showSettings, setShowSettings] = useState(!DEFAULT_API_URL);
+  const [tempApiUrl, setTempApiUrl] = useState(apiUrl);
 
   const sendMessage = useCallback(async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || !apiUrl) return;
 
     const userMessage: ChatMessage = { role: 'user', content: input.trim() };
     const newMessages = [...messages, userMessage];
@@ -34,7 +39,7 @@ export default function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/chat`, {
+      const response = await fetch(`${apiUrl}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: newMessages }),
@@ -76,15 +81,48 @@ export default function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [input, messages, isLoading]);
+  }, [input, messages, isLoading, apiUrl]);
+
+  const saveSettings = () => {
+    setApiUrl(tempApiUrl);
+    setShowSettings(false);
+  };
 
   return (
     <KeyboardAvoidingView 
       style={styles.container} 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      {/* Settings Modal */}
+      <Modal visible={showSettings} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>⚙️ Configuración</Text>
+            <Text style={styles.modalLabel}>URL de la API:</Text>
+            <TextInput
+              style={styles.modalInput}
+              value={tempApiUrl}
+              onChangeText={setTempApiUrl}
+              placeholder="http://tu-ip:3000"
+              placeholderTextColor="#666"
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            <Text style={styles.modalHint}>
+              Ingresa la IP de tu computador (ej: http://192.168.1.100:3000)
+            </Text>
+            <TouchableOpacity style={styles.modalButton} onPress={saveSettings}>
+              <Text style={styles.modalButtonText}>Guardar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <View style={styles.header}>
         <Text style={styles.headerText}>Chat IA</Text>
+        <TouchableOpacity onPress={() => { setTempApiUrl(apiUrl); setShowSettings(true); }}>
+          <Text style={styles.settingsIcon}>⚙️</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.messages} contentContainerStyle={styles.messagesContent}>
@@ -140,6 +178,9 @@ const styles = StyleSheet.create({
     paddingTop: 48,
     borderBottomWidth: 1,
     borderBottomColor: '#00f5ff33',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   headerText: {
     color: '#00f5ff',
@@ -150,6 +191,9 @@ const styles = StyleSheet.create({
     textShadowColor: '#00f5ff',
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 10,
+  },
+  settingsIcon: {
+    fontSize: 24,
   },
   messages: {
     flex: 1,
@@ -238,5 +282,59 @@ const styles = StyleSheet.create({
     color: '#0a0a0f',
     fontSize: 22,
     fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#12121a',
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+    borderWidth: 1,
+    borderColor: '#00f5ff33',
+  },
+  modalTitle: {
+    color: '#00f5ff',
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  modalLabel: {
+    color: '#888',
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  modalInput: {
+    backgroundColor: '#1a1a2e',
+    borderRadius: 8,
+    padding: 12,
+    color: '#fff',
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+  modalHint: {
+    color: '#666',
+    fontSize: 12,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  modalButton: {
+    backgroundColor: '#00f5ff',
+    borderRadius: 8,
+    padding: 14,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    color: '#0a0a0f',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });
