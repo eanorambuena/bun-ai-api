@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: bun-ai-api
+    runtime: node
+    rootDir: apps/api
+    buildCommand: curl -fsSL https://bun.sh/install | bash && ~/.bun/bin/bun install
+    startCommand: ~/.bun/bin/bun run start
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CEREBRAS_API_KEY
+        sync: false

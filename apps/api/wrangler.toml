@@ -1,0 +1,11 @@
+name = "bun-ai-api"
+main = "src/worker.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Las API keys van en secrets, no aquí
+
+# Para desarrollo local
+# [dev]
+# port = 3000
